@@ -1,11 +1,43 @@
 var prevdayUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
 
+depth_list = [];
+magnitude_list = [];
+
+var geojson;
+
+// Define a markerSize function that will give each city a different radius based on its population
+function markerSize(magnitude) {
+  return (magnitude) * 40;
+}
+
+function circleColor(depth) {
+  if (depth < 1) {
+    return "#03f0fc"
+  }
+  else if (depth < 10) {
+    return "#03befc"
+  }
+  else if (depth < 25) {
+    return "#03a5fc"
+  }
+  else if (depth < 60) {
+    return "#0384fc"
+  }
+  else if (depth < 100) {
+    return "#0367fc"
+  }
+  else {
+    return "#031cfc"
+  }
+}
+
 // Perform a GET request to the query URL
 d3.json(prevdayUrl).then(function(data) {
 
     var features = data.features;
-
+    
     earthquakeMarkers = [];
+    var markers = L.markerClusterGroup()
     
     for (var i = 0; i < features.length; i++) {
 
@@ -15,7 +47,10 @@ d3.json(prevdayUrl).then(function(data) {
         var depth = features[i].geometry.coordinates[2];
         var magnitude = features[i].properties.mag;
         var time = features[i].properties.time;
-    
+
+        depth_list.push(depth);
+        magnitude_list.push(magnitude);
+
         var d = new Date(time);
         var formattedDate = (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear();
         var hours = (d.getHours() < 10) ? "0" + d.getHours() : d.getHours();
@@ -24,15 +59,22 @@ d3.json(prevdayUrl).then(function(data) {
     
         formattedDate = formattedDate + " " + formattedTime;
 
-        earthquakeMarkers.push(
-            L.marker([lat,lng])
+        
+        markers.addLayer(
+            L.circleMarker([lat,lng], {
+              fillOpacity: 0.75,
+              color: "white",
+              fillColor: circleColor(depth),
+              radius: markerSize(magnitude)
+            })
             .bindPopup("Location:  " + place
             + ".<br> Time occured:  " + formattedDate 
             + ".<br> Magnitutde:  " + magnitude 
             + ".<br> Depth:  " + depth + ".")
         );
+        earthquakeMarkers.push(markers);
     };
-    console.log(earthquakeMarkers)
+
     var earthquakeLayer = L.layerGroup(earthquakeMarkers);
   
   // Define streetmap and darkmap layers
@@ -87,4 +129,6 @@ d3.json(prevdayUrl).then(function(data) {
     collapsed: true
   }).addTo(myMap);
 
+  myMap   
 });
+
