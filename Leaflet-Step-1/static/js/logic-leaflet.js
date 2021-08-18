@@ -7,7 +7,7 @@ var geojson;
 
 // Define a markerSize function that will give each city a different radius based on its population
 function markerSize(magnitude) {
-  return (magnitude) * 40;
+  return (magnitude) * 5;
 }
 
 function circleColor(depth) {
