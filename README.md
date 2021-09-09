@@ -1,4 +1,4 @@
-# leaflet-challenge
+Earthquake-map-layer
 
 1)  Conducted an API call to get magnitude and depth of all earthquakes that occured in the previous 24 hours, from http://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php.
 2)  Three map layers were used with the map, and an additional overlay to display or not display pins.
